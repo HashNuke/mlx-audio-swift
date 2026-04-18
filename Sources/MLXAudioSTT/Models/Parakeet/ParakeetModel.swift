@@ -75,10 +75,10 @@ public final class ParakeetModel: Module, STTGenerationModel {
         }
     }
 
-    public func generate(
+    public func generateAligned(
         audio: MLXArray,
         generationParameters: STTGenerateParameters
-    ) -> STTOutput {
+    ) -> ParakeetAlignedResult {
         let audio1D = audio.ndim > 1 ? audio.mean(axis: -1) : audio
         let sampleRate = preprocessConfig.sampleRate
         let totalSamples = audio1D.shape[0]
@@ -118,6 +118,15 @@ public final class ParakeetModel: Module, STTGenerationModel {
 
             result = ParakeetAlignment.sentencesToResult(ParakeetAlignment.tokensToSentences(allTokens))
         }
+
+        return result
+    }
+
+    public func generate(
+        audio: MLXArray,
+        generationParameters: STTGenerateParameters
+    ) -> STTOutput {
+        let result = generateAligned(audio: audio, generationParameters: generationParameters)
 
         return STTOutput(
             text: result.text,
