@@ -1120,6 +1120,22 @@ struct KokoroTTSTests {
     }
 }
 
+@Suite("MisakiTextProcessor")
+struct MisakiTextProcessorTests {
+    @Test func bundledResourceDirectoryValidationThrowsWhenFilesMissing() async throws {
+        let tempDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tempDirectory) }
+
+        let processor = MisakiTextProcessor(resourceDirectory: tempDirectory)
+
+        await #expect(throws: MisakiTextProcessor.MisakiError.self) {
+            try await processor.prepare()
+        }
+    }
+}
+
 // MARK: - Kokoro Multilingual Processor Tests
 
 @Suite("KokoroMultilingualProcessor")
